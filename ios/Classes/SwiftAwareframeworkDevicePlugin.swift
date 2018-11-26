@@ -5,15 +5,15 @@ import com_awareframework_ios_sensor_device
 import com_awareframework_ios_sensor_core
 import awareframework_core
 
-public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, DeviceObserver{
+public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, DeviceOserver{
 
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         if self.sensor == nil {
             if let config = call.arguments as? Dictionary<String,Any>{
                 let json = JSON.init(config)
-                self.sensor = DeviceSensor.init(DeviceSensor.Config(json))
+                self.deviceSensor = DeviceSensor.init(DeviceSensor.Config(json))
             }else{
-                self.sensor = DeviceSensor.init(DeviceSensor.Config())
+                self.deviceSensor = DeviceSensor.init(DeviceSensor.Config())
             }
             self.deviceSensor?.CONFIG.sensorObserver = self
             return self.deviceSensor
@@ -30,20 +30,20 @@ public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlu
     }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
-        // add own channel
-        super.setChannels(with: registrar,
-                          instance: SwiftAwareframeworkDevicePlugin(),
-                          methodChannelName: "awareframework_device/method",
-                          eventChannelName: "awareframework_device/event")
-
+        let instance = SwiftAwareframeworkDevicePlugin()
+        super.setMethodChannel(with: registrar,
+                               instance: instance,
+                               channelName: "awareframework_device/method")
+        self.setEventChannels(with: registrar,
+                              instance: instance,
+                              channelNames: ["awareframework_device/event"])
     }
 
-
-//    public func onDataChanged(data: DeviceData) {
-//        for handler in self.streamHandlers {
-//            if handler.eventName == "on_data_changed" {
-//                handler.eventSink(data.toDictionary())
-//            }
-//        }
-//    }
+    public func onDeviceChanged(data: DeviceData) {
+        for handler in self.streamHandlers {
+            if handler.eventName == "on_data_changed" {
+                handler.eventSink(data.toDictionary())
+            }
+        }
+    }
 }

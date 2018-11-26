@@ -14,19 +14,17 @@ class DeviceSensor extends AwareSensorCore {
   DeviceSensor(DeviceSensorConfig config):this.convenience(config);
   DeviceSensor.convenience(config) : super(config){
     /// Set sensor method & event channels
-    super.setSensorChannels(_deviceMethod, _deviceStream);
+    super.setMethodChannel(_deviceMethod);
   }
 
   /// A sensor observer instance
-  Stream<Map<String,dynamic>> get onDataChanged {
-     return super.receiveBroadcastStream("on_data_changed").map((dynamic event) => Map<String,dynamic>.from(event));
+  Stream<Map<String,dynamic>> onDataChanged(String id) {
+    return super.getBroadcastStream(_deviceStream, "on_data_changed", id).map((dynamic event) => Map<String,dynamic>.from(event));
   }
 }
 
 class DeviceSensorConfig extends AwareSensorConfig{
   DeviceSensorConfig();
-
-  /// TODO
 
   @override
   Map<String, dynamic> toMap() {
@@ -37,9 +35,10 @@ class DeviceSensorConfig extends AwareSensorConfig{
 
 /// Make an AwareWidget
 class DeviceCard extends StatefulWidget {
-  DeviceCard({Key key, @required this.sensor}) : super(key: key);
+  DeviceCard({Key key, @required this.sensor, this.cardId = "device_card"}) : super(key: key);
 
   DeviceSensor sensor;
+  String cardId;
 
   @override
   DeviceCardState createState() => new DeviceCardState();
@@ -48,29 +47,25 @@ class DeviceCard extends StatefulWidget {
 
 class DeviceCardState extends State<DeviceCard> {
 
-  List<LineSeriesData> dataLine1 = List<LineSeriesData>();
-  List<LineSeriesData> dataLine2 = List<LineSeriesData>();
-  List<LineSeriesData> dataLine3 = List<LineSeriesData>();
-  int bufferSize = 299;
+  String deviceInfo = "";
 
   @override
   void initState() {
 
     super.initState();
     // set observer
-    widget.sensor.onDataChanged.listen((event) {
+    widget.sensor.onDataChanged(widget.cardId).listen((event) {
       setState((){
         if(event!=null){
           DateTime.fromMicrosecondsSinceEpoch(event['timestamp']);
-          StreamLineSeriesChart.add(data:event['x'], into:dataLine1, id:"x", buffer: bufferSize);
-          StreamLineSeriesChart.add(data:event['y'], into:dataLine2, id:"y", buffer: bufferSize);
-          StreamLineSeriesChart.add(data:event['z'], into:dataLine3, id:"z", buffer: bufferSize);
+          deviceInfo = event.toString();
         }
       });
     }, onError: (dynamic error) {
         print('Received error: ${error.message}');
     });
     print(widget.sensor);
+    widget.sensor.start();
   }
 
 
@@ -78,13 +73,19 @@ class DeviceCardState extends State<DeviceCard> {
   Widget build(BuildContext context) {
     return new AwareCard(
       contentWidget: SizedBox(
-          height:250.0,
           width: MediaQuery.of(context).size.width*0.8,
-          child: new StreamLineSeriesChart(StreamLineSeriesChart.createTimeSeriesData(dataLine1, dataLine2, dataLine3)),
+          child: new Text(deviceInfo),
         ),
       title: "Device",
       sensor: widget.sensor
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    widget.sensor.cancelBroadcastStream(widget.cardId);
+    super.dispose();
   }
 
 }

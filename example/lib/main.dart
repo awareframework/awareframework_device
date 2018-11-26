@@ -26,12 +26,11 @@ class _MyAppState extends State<MyApp> {
 
     sensor = new DeviceSensor(config);
 
+    sensor.start();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return new MaterialApp(
       home: new Scaffold(
           appBar: new AppBar(
