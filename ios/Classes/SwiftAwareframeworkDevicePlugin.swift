@@ -1,6 +1,5 @@
 import Flutter
 import UIKit
-import SwiftyJSON
 import com_awareframework_ios_sensor_device
 import com_awareframework_ios_sensor_core
 import awareframework_core
@@ -10,8 +9,7 @@ public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlu
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         if self.sensor == nil {
             if let config = call.arguments as? Dictionary<String,Any>{
-                let json = JSON.init(config)
-                self.deviceSensor = DeviceSensor.init(DeviceSensor.Config(json))
+                self.deviceSensor = DeviceSensor.init(DeviceSensor.Config(config))
             }else{
                 self.deviceSensor = DeviceSensor.init(DeviceSensor.Config())
             }

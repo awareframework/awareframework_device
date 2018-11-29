@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:awareframework_core/awareframework_core.dart';
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 
 /// init sensor
 class DeviceSensor extends AwareSensorCore {
@@ -18,8 +17,15 @@ class DeviceSensor extends AwareSensorCore {
   }
 
   /// A sensor observer instance
-  Stream<Map<String,dynamic>> onDataChanged(String id) {
-    return super.getBroadcastStream(_deviceStream, "on_data_changed", id).map((dynamic event) => Map<String,dynamic>.from(event));
+  Stream<Map<String,dynamic>> get onDataChanged {
+    return super.getBroadcastStream(
+        _deviceStream, "on_data_changed"
+    ).map((dynamic event) => Map<String,dynamic>.from(event));
+  }
+
+  @override
+  void cancelAllEventChannels() {
+    cancelBroadcastStream("on_data_changed");
   }
 }
 
@@ -34,11 +40,10 @@ class DeviceSensorConfig extends AwareSensorConfig{
 }
 
 /// Make an AwareWidget
-class DeviceCard extends StatefulWidget {
-  DeviceCard({Key key, @required this.sensor, this.cardId = "device_card"}) : super(key: key);
+class DeviceCard extends StatefulWidget { DeviceCard({Key key, @required this.sensor}) : super(key: key);
 
-  DeviceSensor sensor;
-  String cardId;
+  final DeviceSensor sensor;
+  String deviceInfo = "";
 
   @override
   DeviceCardState createState() => new DeviceCardState();
@@ -47,18 +52,16 @@ class DeviceCard extends StatefulWidget {
 
 class DeviceCardState extends State<DeviceCard> {
 
-  String deviceInfo = "";
-
   @override
   void initState() {
 
     super.initState();
     // set observer
-    widget.sensor.onDataChanged(widget.cardId).listen((event) {
+    widget.sensor.onDataChanged.listen((event) {
       setState((){
         if(event!=null){
           DateTime.fromMicrosecondsSinceEpoch(event['timestamp']);
-          deviceInfo = event.toString();
+          widget.deviceInfo = event.toString();
         }
       });
     }, onError: (dynamic error) {
@@ -74,7 +77,7 @@ class DeviceCardState extends State<DeviceCard> {
     return new AwareCard(
       contentWidget: SizedBox(
           width: MediaQuery.of(context).size.width*0.8,
-          child: new Text(deviceInfo),
+          child: new Text(widget.deviceInfo),
         ),
       title: "Device",
       sensor: widget.sensor
@@ -83,8 +86,7 @@ class DeviceCardState extends State<DeviceCard> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    widget.sensor.cancelBroadcastStream(widget.cardId);
+    widget.sensor.cancelAllEventChannels();
     super.dispose();
   }
 
