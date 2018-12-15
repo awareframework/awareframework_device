@@ -1,6 +1,8 @@
 # Aware Device
 
-TODO
+[![Build Status](https://travis-ci.org/awareframework/awareframework_device.svg?branch=master)](https://travis-ci.org/awareframework/awareframework_device)
+
+The device sensor provides device manufacturer, model, operating system version and other information.
 
 ## Install the plugin into project
 1. Edit `pubspec.yaml`
@@ -16,13 +18,14 @@ import 'package:awareframework_core/awareframework_core.dart';
 ```
 
 ## Public functions
-### device Sensor
+### Device Sensor
 - `start()`
 - `stop()` 
-- `sync(force: Boolean)`
+- `sync(boolean force)`
 - `enable()`
 - `disable()`
 - `isEnable()`
+- `setLabel(String label)`
 
 ### Configuration Keys
 TODO
@@ -52,12 +55,12 @@ var config = DeviceSensorConfig()
 // init sensor
 var sensor = new DeviceSensor(config);
 
-void mathod(){
+void method(){
     /// start 
     sensor.start();
     
     /// set observer
-    sensor.onDataChanged.listen((Map<String,dynamic> result){
+    sensor.onDataChanged.listen((DeviceData data){
       setState((){
         // Your code here
       });

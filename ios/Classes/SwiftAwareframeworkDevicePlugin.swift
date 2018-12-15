@@ -4,7 +4,7 @@ import com_awareframework_ios_sensor_device
 import com_awareframework_ios_sensor_core
 import awareframework_core
 
-public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, DeviceOserver{
+public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, DeviceObserver{
 
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         if self.sensor == nil {
@@ -34,7 +34,8 @@ public class SwiftAwareframeworkDevicePlugin: AwareFlutterPluginCore, FlutterPlu
                                channelName: "awareframework_device/method")
         self.setEventChannels(with: registrar,
                               instance: instance,
-                              channelNames: ["awareframework_device/event"])
+                              channelNames: ["awareframework_device/event",
+                                             "awareframework_device/event_on_data_changed"])
     }
 
     public func onDeviceChanged(data: DeviceData) {

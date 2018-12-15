@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:awareframework_device/awareframework_device.dart';
-import 'package:awareframework_core/awareframework_core.dart';
 
 void main() => runApp(new MyApp());
 
@@ -24,7 +21,7 @@ class _MyAppState extends State<MyApp> {
     config = DeviceSensorConfig()
       ..debug = true;
 
-    sensor = new DeviceSensor(config);
+    sensor = new DeviceSensor.init(config);
 
     sensor.start();
   }
