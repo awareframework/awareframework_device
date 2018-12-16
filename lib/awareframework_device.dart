@@ -49,7 +49,7 @@ import 'package:flutter/material.dart';
 /// ```
 class DeviceSensor extends AwareSensor {
   static const MethodChannel _deviceMethod = const MethodChannel('awareframework_device/method');
-  static const EventChannel  _deviceStream  = const EventChannel('awareframework_device/event');
+  // static const EventChannel  _deviceStream  = const EventChannel('awareframework_device/event');
 
   static const EventChannel  _onDataChangedStream  = const EventChannel('awareframework_device/event_on_data_changed');
 

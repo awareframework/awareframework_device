@@ -53,7 +53,7 @@ var config = DeviceSensorConfig()
   ..label = "label";
 
 // init sensor
-var sensor = new DeviceSensor(config);
+var sensor = new DeviceSensor.init(config);
 
 void method(){
     /// start 
